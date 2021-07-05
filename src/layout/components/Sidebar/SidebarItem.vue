@@ -1,5 +1,7 @@
 <template>
+  <!-- div 中的 item 是router对象  在小木读书中是  path: '/book' 的路由对象-->
   <div v-if="!item.hidden">
+    <!-- template 的 v-if 与下面 el-submenu 的 v-else 是互斥的 item.children 是路由对象的children数组 -->
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
@@ -7,7 +9,7 @@
         </el-menu-item>
       </app-link>
     </template>
-
+    <!-- 与上方 template 的 v-if 互斥 -->
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
@@ -56,14 +58,22 @@ export default {
     this.onlyOneChild = null
     return {}
   },
+  /*
+    item：router 对象
+    children：router 对象的 children 属性
+  */
   methods: {
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter(item => {
+        /*
+        arr2=arr1.filter(fn(a))表示会将arr1中所有的值a,进行fn()的筛选，
+        筛选通过（或者return true）的值，添加进arr2中，否则不添加进去
+       */
         if (item.hidden) {
           return false
         } else {
           // Temp set(will be used if only has one showing child)
-          this.onlyOneChild = item
+          this.onlyOneChild = item // 当showingChildren.length === 1 且 onlyOneChild存在，onlyOneChild尚未使用
           return true
         }
       })
@@ -88,6 +98,7 @@ export default {
       if (isExternal(this.basePath)) {
         return this.basePath
       }
+      // path.resolve() 方法会把一个路径或路径片段的序列解析为一个绝对路径。
       return path.resolve(this.basePath, routePath)
     }
   }
